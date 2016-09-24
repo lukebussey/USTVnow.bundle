@@ -24,24 +24,4 @@ def MediaObjectsForURL(url):
 ####################################################################################################
 @indirect
 def PlayVideo(url):
-    streams = []
-    playList = HTTP.Request(url).content
-    for line in playList.splitlines():
-        if 'BANDWIDTH' in line:
-            stream = {}
-            stream['bitrate'] = int(Regex('(?<=BANDWIDTH=)[0-9]+').search(line).group(0))
-
-            if 'RESOLUTION' in line:
-                stream['resolution'] = int(Regex('(?<=RESOLUTION=)[0-9]+x[0-9]+').search(line).group(0).split('x')[1])
-            else:
-                stream['resolution'] = 0
-
-        elif '.m3u8' in line:
-            if not line.startswith('http://'):
-                path = url[:url.rfind('/') + 1]
-                stream['url'] = path + line
-
-            streams.append(stream)
-
-    sorted_streams = sorted(streams, key = lambda stream: stream['bitrate'], reverse = True)
-    return IndirectResponse(VideoClipObject, key=HTTPLiveStreamURL(url=sorted_streams[0]['url']))
+    return IndirectResponse(VideoClipObject, key=HTTPLiveStreamURL(url=url))
